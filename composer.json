@@ -1,0 +1,17 @@
+{
+    "name": "student/php-advanced",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "student",
+            "email": "student@bk.ru"
+        }
+    ],
+    "require": {
+        "fakerphp/faker": "^1.21"
+    }
+}
