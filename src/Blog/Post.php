@@ -4,20 +4,21 @@ namespace Geekbrains\Php2\Blog;
 
 use Geekbrains\Php2\Person\User;
 
-class Comment
+class Post
 {
+
     /**
      * @param UUID $uuid
-     * @param User $user
-     * @param Post $post
+     * @param User $author
+     * @param string $title
      * @param string $text
      */
     public function __construct(
-        private UUID   $uuid,
-        private User   $user,
-        private Post   $post,
+        private UUID $uuid,
+        private User $author,
+        private string $title,
         private string $text
-    )  {
+    ) {
     }
 
     /**
@@ -31,33 +32,33 @@ class Comment
     /**
      * @return User
      */
-    public function getUser(): User
+    public function getAuthor(): User
     {
-        return $this->user;
+        return $this->author;
     }
 
     /**
-     * @param User $user
+     * @param User $author
      */
-    public function setUser(User $user): void
+    public function setAuthor(User $author): void
     {
-        $this->user = $user;
+        $this->author = $author;
     }
 
     /**
-     * @return Post
+     * @return string
      */
-    public function getPost(): Post
+    public function getTitle(): string
     {
-        return $this->post;
+        return $this->title;
     }
 
     /**
-     * @param Post $post
+     * @param string $title
      */
-    public function setPost(Post $post): void
+    public function setTitle(string $title): void
     {
-        $this->post = $post;
+        $this->title = $title;
     }
 
     /**
