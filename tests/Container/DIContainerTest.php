@@ -106,6 +106,4 @@ class DIContainerTest extends TestCase
             $object
         );
     }
-
-
 }

@@ -2,8 +2,6 @@
 
 namespace Actions;
 
-use Doctrine\Instantiator\Exception\ExceptionInterface;
-use Geekbrains\Php2\Blog\Exceptions\AuthException;
 use Geekbrains\Php2\Blog\Exceptions\PostNotFoundException;
 use Geekbrains\Php2\Blog\Exceptions\UserNotFoundException;
 use Geekbrains\Php2\Blog\Post;
@@ -91,6 +89,10 @@ class CreatePostTest extends TestCase
             }
 
             public function delete(UUID $uuid): void
+            {
+            }
+
+            public function clear(): void
             {
             }
         };

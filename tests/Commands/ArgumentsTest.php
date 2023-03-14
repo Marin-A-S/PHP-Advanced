@@ -3,7 +3,6 @@
 namespace Geekbrains\Php2\Commands;
 
 use Geekbrains\Php2\Blog\Commands\Arguments;
-use Geekbrains\Php2\Blog\Exceptions\ArgumentsCountionException;
 use Geekbrains\Php2\Blog\Exceptions\ArgumentsException;
 use PHPUnit\Framework\TestCase;
 
