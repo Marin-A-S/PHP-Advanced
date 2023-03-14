@@ -7,6 +7,7 @@ use Geekbrains\Php2\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use Geekbrains\Php2\Blog\UUID;
 use Geekbrains\Php2\DummyLogger;
 use Geekbrains\Php2\Http\Actions\User\FindByUsername;
+use Geekbrains\Php2\Http\Auth\JsonBodyUuidAuthentication;
 use Geekbrains\Php2\Http\ErrorResponse;
 use Geekbrains\Php2\Http\Request;
 use Geekbrains\Php2\Http\SuccessfulResponse;
@@ -30,8 +31,9 @@ class FindByUsernameActionTest extends TestCase
         $request = new Request([], [], "");
         // Создаём стаб репозитория пользователей
         $usersRepository = $this->usersRepository([]);
+        $authenticationStub = $this->createStub(JsonBodyUuidAuthentication::class);
         //Создаём объект действия
-        $action = new FindByUsername($usersRepository, new DummyLogger());
+        $action = new FindByUsername($usersRepository, $authenticationStub, new DummyLogger());
         // Запускаем действие
         $response = $action->handle($request);
         // Проверяем, что ответ - неудачный
@@ -54,7 +56,8 @@ class FindByUsernameActionTest extends TestCase
         $request = new Request(['username' => 'ivan'], [], '');
         // Репозиторий пользователей пуст
         $usersRepository = $this->usersRepository([]);
-        $action = new FindByUsername($usersRepository, new DummyLogger());
+        $authenticationStub = $this->createStub(JsonBodyUuidAuthentication::class);
+        $action = new FindByUsername($usersRepository, $authenticationStub, new DummyLogger());
         $response = $action->handle($request);
         $this->assertInstanceOf(ErrorResponse::class, $response);
         $this->expectOutputString('{"success":false,"reason":"Not found"}');
@@ -77,9 +80,11 @@ class FindByUsernameActionTest extends TestCase
                 UUID::random(),
                 new Name('Ivan', 'Nikitin'),
                 'ivan',
+                'qwerty'
             ),
         ]);
-        $action = new FindByUsername($usersRepository, new DummyLogger());
+        $authenticationStub = $this->createStub(JsonBodyUuidAuthentication::class);
+        $action = new FindByUsername($usersRepository, $authenticationStub, new DummyLogger());
         $response = $action->handle($request);
         // Проверяем, что ответ - удачный
         $this->assertInstanceOf(SuccessfulResponse::class, $response);

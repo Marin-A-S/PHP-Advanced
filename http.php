@@ -1,5 +1,8 @@
 <?php
 
+use Geekbrains\Php2\Blog\Exceptions\HttpException;
+use Geekbrains\Php2\Http\Actions\Authentication\LogIn;
+use Geekbrains\Php2\Http\Actions\Authentication\LogOut;
 use Geekbrains\Php2\Http\Actions\Comment\CreateComment;
 use Geekbrains\Php2\Http\Actions\Comment\DeleteComment;
 use Geekbrains\Php2\Http\Actions\Comment\FindCommentByUuid;
@@ -63,6 +66,9 @@ $routes = [
         '/comments/create' => CreateComment::class,
         '/likesPosts/create' => CreateLikePost::class,
         '/likesComments/create' => CreateLikeComment::class,
+        // Добавили маршрут обмена пароля на токен
+        '/login' => LogIn::class,
+        '/logout' => LogOut::class,
     ],
     'DELETE' => [
         '/users' => DeleteUser::class,

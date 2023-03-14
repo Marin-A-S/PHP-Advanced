@@ -22,7 +22,7 @@ class SqlitePostsRepository implements PostsRepositoryInterface
     ) {
     }
 
-    // метод сохранения и изменения статьей!!!
+    // метод сохранения и изменения поста
     /**
      * @param Post $post
      * @return void

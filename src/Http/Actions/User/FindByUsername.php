@@ -2,10 +2,12 @@
 
 namespace Geekbrains\Php2\Http\Actions\User;
 
+use Geekbrains\Php2\Blog\Exceptions\AuthException;
 use Geekbrains\Php2\Blog\Exceptions\HttpException;
 use Geekbrains\Php2\Blog\Exceptions\UserNotFoundException;
 use Geekbrains\Php2\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use Geekbrains\Php2\Http\Actions\ActionInterface;
+use Geekbrains\Php2\Http\Auth\TokenAuthenticationInterface;
 use Geekbrains\Php2\Http\ErrorResponse;
 use Geekbrains\Php2\Http\Request;
 use Geekbrains\Php2\Http\Response;
@@ -18,12 +20,20 @@ class FindByUsername implements ActionInterface
     // внедряем его контракт в качестве зависимости
     public function __construct(
         private UsersRepositoryInterface $usersRepository,
+        private TokenAuthenticationInterface $authentication,
         private LoggerInterface          $logger,
     ) {
     }
 
     public function handle(Request $request): Response
     {
+        // Идентифицируем пользователя по токену
+        try {
+            $this->authentication->user($request);
+        } catch (AuthException $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+
         try {
             // получаем имя пользователя из запроса
             $username = $request->query('username');

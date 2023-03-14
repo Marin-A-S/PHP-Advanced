@@ -1,6 +1,8 @@
 <?php
 
 use Geekbrains\Php2\Blog\Container\DIContainer;
+use Geekbrains\Php2\Blog\Repositories\AuthTokensRepository\AuthTokensRepositoryInterface;
+use Geekbrains\Php2\Blog\Repositories\AuthTokensRepository\SqliteAuthTokensRepository;
 use Geekbrains\Php2\Blog\Repositories\CommentsRepository\CommentsRepositoryInterface;
 use Geekbrains\Php2\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
 use Geekbrains\Php2\Blog\Repositories\LikesCommentsRepository\LikesCommentsRepositoryInterface;
@@ -11,9 +13,13 @@ use Geekbrains\Php2\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use Geekbrains\Php2\Blog\Repositories\PostsRepository\SqlitePostsRepository;
 use Geekbrains\Php2\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 use Geekbrains\Php2\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
-use Geekbrains\Php2\Http\Auth\IdentificationInterface;
-use Geekbrains\Php2\Http\Auth\JsonBodyUsernameIdentification;
-use Geekbrains\Php2\Http\Auth\JsonBodyUuidIdentification;
+use Geekbrains\Php2\Http\Auth\AuthenticationInterface;
+use Geekbrains\Php2\Http\Auth\BearerTokenAuthentication;
+use Geekbrains\Php2\Http\Auth\JsonBodyUsernameAuthentication;
+use Geekbrains\Php2\Http\Auth\JsonBodyUuidAuthentication;
+use Geekbrains\Php2\Http\Auth\PasswordAuthentication;
+use Geekbrains\Php2\Http\Auth\PasswordAuthenticationInterface;
+use Geekbrains\Php2\Http\Auth\TokenAuthenticationInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -74,8 +80,8 @@ $container->bind(
 );
 
 $container->bind(
-    IdentificationInterface::class,
-    JsonBodyUuidIdentification::class
+    AuthenticationInterface::class,
+    JsonBodyUuidAuthentication::class
 );
 
 // сохраним репозиторий пользователей
@@ -106,6 +112,26 @@ $container->bind(
 $container->bind(
     LikesPostsRepositoryInterface::class,
     SqliteLikesPostsRepository::class
+);
+
+// аутентификация
+$container->bind(
+    AuthenticationInterface::class,
+PasswordAuthentication::class
+);
+
+$container->bind(
+    PasswordAuthenticationInterface::class,
+    PasswordAuthentication::class
+);
+$container->bind(
+    AuthTokensRepositoryInterface::class,
+    SqliteAuthTokensRepository::class
+);
+
+$container->bind(
+    TokenAuthenticationInterface::class,
+    BearerTokenAuthentication::class
 );
 
 // Возвращаем объект контейнера

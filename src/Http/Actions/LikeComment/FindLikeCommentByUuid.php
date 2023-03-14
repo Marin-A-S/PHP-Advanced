@@ -2,12 +2,14 @@
 
 namespace Geekbrains\Php2\Http\Actions\LikeComment;
 
+use Geekbrains\Php2\Blog\Exceptions\AuthException;
 use Geekbrains\Php2\Blog\Exceptions\HttpException;
 use Geekbrains\Php2\Blog\Exceptions\InvalidArgumentException;
 use Geekbrains\Php2\Blog\Exceptions\LikesCommentNotFoundException;
 use Geekbrains\Php2\Blog\Repositories\LikesCommentsRepository\LikesCommentsRepositoryInterface;
 use Geekbrains\Php2\Blog\UUID;
 use Geekbrains\Php2\Http\Actions\ActionInterface;
+use Geekbrains\Php2\Http\Auth\TokenAuthenticationInterface;
 use Geekbrains\Php2\Http\ErrorResponse;
 use Geekbrains\Php2\Http\Request;
 use Geekbrains\Php2\Http\Response;
@@ -18,7 +20,8 @@ class FindLikeCommentByUuid implements ActionInterface
 {
     public function __construct(
         private LikesCommentsRepositoryInterface $likesCommentsRepository,
-        private LoggerInterface $logger,
+        private TokenAuthenticationInterface $authentication,
+        private LoggerInterface               $logger,
     ) {
     }
 
@@ -27,6 +30,14 @@ class FindLikeCommentByUuid implements ActionInterface
      */
     public function handle(Request $request): Response
     {
+        // Идентифицируем пользователя - по токену
+        try {
+            $user = $this->authentication->user($request);
+            $userUuid = $user->uuid();
+        } catch (AuthException $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+
         try {
             // получаем uuid из запроса
             $uuid = $request->query('comment_uuid');

@@ -50,6 +50,7 @@ class SqlitePostsRepositoryTest extends TestCase
             new UUID('6d61d2d0-6bf8-426f-855a-dc9de949594b'),
             new Name('Maria', 'Svetlova'),
             'User-4',
+            'qwerty',
         );
 
         $repository->save(
@@ -77,6 +78,7 @@ class SqlitePostsRepositoryTest extends TestCase
             'username' => 'User-4',
             'first_name' => 'Maria',
             'last_name' => 'Svetlova',
+            'password' => 'qwerty',
         ]);
         $connectionStub->method('prepare')->willReturn($statementMock);
 

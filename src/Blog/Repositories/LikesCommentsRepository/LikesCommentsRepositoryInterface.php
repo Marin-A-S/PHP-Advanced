@@ -9,4 +9,5 @@ interface LikesCommentsRepositoryInterface
 {
     public function save(LikeComment $like): void;
     public function getByCommentUuid(UUID $uuid): array;
+    public function checkUserLikeForCommentExists($commentUuid, $userUuid): void;
 }
