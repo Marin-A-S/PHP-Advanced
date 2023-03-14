@@ -2,6 +2,7 @@
 
 namespace Geekbrains\Php2\Http\Actions\LikeComment;
 
+use Geekbrains\Php2\Blog\Exceptions\AuthException;
 use Geekbrains\Php2\Blog\Exceptions\CommentNotFoundException;
 use Geekbrains\Php2\Blog\Exceptions\HttpException;
 use Geekbrains\Php2\Blog\Exceptions\InvalidArgumentException;
@@ -15,11 +16,13 @@ use Geekbrains\Php2\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use Geekbrains\Php2\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use Geekbrains\Php2\Blog\UUID;
 use Geekbrains\Php2\Http\Actions\ActionInterface;
+use Geekbrains\Php2\Http\Auth\TokenAuthenticationInterface;
 use Geekbrains\Php2\Http\ErrorResponse;
 use Geekbrains\Php2\Http\Request;
 use Geekbrains\Php2\Http\Response;
 use Geekbrains\Php2\Http\SuccessfulResponse;
 use Psr\Log\LoggerInterface;
+
 
 class CreateLikeComment implements ActionInterface
 {
@@ -28,6 +31,7 @@ class CreateLikeComment implements ActionInterface
         private CommentsRepositoryInterface $commentsRepository,
         private PostsRepositoryInterface $postsRepository,
         private UsersRepositoryInterface $usersRepository,
+        private TokenAuthenticationInterface $authentication,
         private LoggerInterface $logger,
     ) {
     }
@@ -38,6 +42,14 @@ class CreateLikeComment implements ActionInterface
      */
     public function handle(Request $request): Response
     {
+        // Идентифицируем пользователя - по токену
+        try {
+            $user = $this->authentication->user($request);
+            $userUuid = $user->uuid();
+        } catch (AuthException $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+
         // Из данных POST запроса заполняем переменные UUID
         try {
             $commentUuid = new UUID($request->jsonBodyField('comment_uuid'));

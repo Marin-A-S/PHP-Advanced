@@ -6,7 +6,6 @@ use Geekbrains\Php2\Person\User;
 
 class Like
 {
-
     /**
      * @param UUID $uuid
      * @param Post $post

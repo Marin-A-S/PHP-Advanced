@@ -12,7 +12,7 @@ use Geekbrains\Php2\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use Geekbrains\Php2\Blog\UUID;
 use Geekbrains\Php2\DummyLogger;
 use Geekbrains\Php2\Http\Actions\Post\CreatePost;
-use Geekbrains\Php2\Http\Auth\JsonBodyUuidIdentification;
+use Geekbrains\Php2\Http\Auth\JsonBodyUuidAuthentication;
 use Geekbrains\Php2\Http\ErrorResponse;
 use Geekbrains\Php2\Http\Request;
 use Geekbrains\Php2\Http\SuccessfulResponse;
@@ -106,7 +106,7 @@ class CreatePostTest extends TestCase
 
         $postsRepository = $this->postsRepository();
 
-        $authenticationStub = $this->createStub(JsonBodyUuidIdentification::class);
+        $authenticationStub = $this->createStub(JsonBodyUuidAuthentication::class);
         $authenticationStub
             ->method('user')
             ->willReturn(
@@ -114,6 +114,7 @@ class CreatePostTest extends TestCase
                     new UUID("10373537-0805-4d7a-830e-22b481b4859c"),
                     new Name('first', 'last'),
                     'username',
+                    'qwerty'
                 )
             );
 
@@ -151,7 +152,7 @@ class CreatePostTest extends TestCase
         $request = new Request([], [], '{"author_uuid":"10373537-0805-4d7a-830e-22b481b4859c","title":"title"}');
 
         $postsRepository = $this->postsRepository([]);
-        $authenticationStub = $this->createStub(JsonBodyUuidIdentification::class);
+        $authenticationStub = $this->createStub(JsonBodyUuidAuthentication::class);
         $authenticationStub
             ->method('user')
             ->willReturn(
@@ -159,6 +160,7 @@ class CreatePostTest extends TestCase
                     new UUID("10373537-0805-4d7a-830e-22b481b4859c"),
                     new Name('first', 'last'),
                     'username',
+                    'qwerty'
                 )
             );
 

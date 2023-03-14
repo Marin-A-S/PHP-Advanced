@@ -27,9 +27,9 @@ class CreateUserCommandTest extends TestCase
         // Описываем тип ожидаемого исключения
         $this->expectException(CommandException::class);
         // и его сообщение
-        $this->expectExceptionMessage('User already exists: Ivan');
+        $this->expectExceptionMessage('User already exists: User-10');
         // Запускаем команду с аргументами
-        $command->handle(new Arguments(['username' => 'Ivan']));
+        $command->handle(new Arguments(['first_name' => 'Ivan', 'last_name' => 'Petrov', 'username' => 'User-10', 'password' => 'qwerty']));
     }
 
     // Тест проверяет, что команда действительно требует имя пользователя
@@ -63,7 +63,7 @@ class CreateUserCommandTest extends TestCase
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: first_name');
         // Запускаем команду
-        $command->handle(new Arguments(['username' => 'Ivan']));
+        $command->handle(new Arguments(['username' => 'Ivan', 'password' => 'qwerty']));
     }
 
     // Тест проверяет, что команда действительно требует фамилию пользователя
@@ -71,13 +71,28 @@ class CreateUserCommandTest extends TestCase
     {
         // Передаём в конструктор команды объект, возвращаемый нашей функцией
         $command = new CreateUserCommand($this->makeUsersRepository(), new DummyLogger());
+
         $this->expectException(ArgumentsException::class);
         $this->expectExceptionMessage('No such argument: last_name');
         $command->handle(new Arguments([
             'username' => 'Ivan',
-            // Нам нужно передать имя пользователя,
-            // чтобы дойти до проверки наличия фамилии
+            'password' => 'qwerty',
             'first_name' => 'Ivan',
+        ]));
+    }
+
+    public function testItRequiresPassword(): void
+    {
+        $command = new CreateUserCommand(
+            $this->makeUsersRepository(),
+            new DummyLogger()
+        );
+        $this->expectException(ArgumentsException::class);
+        $this->expectExceptionMessage('No such argument: password');
+        $command->handle(new Arguments([
+            'first_name' => 'Ivan',
+            'last_name' => 'Ivan',
+            'username' => 'User-10',
         ]));
     }
 
@@ -139,9 +154,10 @@ class CreateUserCommandTest extends TestCase
         $command = new CreateUserCommand($usersRepository, new DummyLogger());
         // Запускаем команду
         $command->handle(new Arguments([
-            'username' => 'Ivan',
             'first_name' => 'Ivan',
             'last_name' => 'Nikitin',
+            'username' => 'Ivan',
+            'password' => 'qwerty',
         ]));
         // Проверяем утверждение относительно мока,
         // а не утверждение относительно команды

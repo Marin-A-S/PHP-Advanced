@@ -2,11 +2,13 @@
 
 namespace Geekbrains\Php2\Http\Actions\LikePost;
 
+use Geekbrains\Php2\Blog\Exceptions\AuthException;
 use Geekbrains\Php2\Blog\Exceptions\HttpException;
 use Geekbrains\Php2\Blog\Exceptions\LikesPostNotFoundException;
 use Geekbrains\Php2\Blog\Repositories\LikesPostsRepository\LikesPostsRepositoryInterface;
 use Geekbrains\Php2\Blog\UUID;
 use Geekbrains\Php2\Http\Actions\ActionInterface;
+use Geekbrains\Php2\Http\Auth\TokenAuthenticationInterface;
 use Geekbrains\Php2\Http\ErrorResponse;
 use Geekbrains\Php2\Http\Request;
 use Geekbrains\Php2\Http\Response;
@@ -17,12 +19,20 @@ class FindLikePostByUuid implements ActionInterface
 {
     public function __construct(
         private LikesPostsRepositoryInterface $likesPostsRepository,
+        private TokenAuthenticationInterface  $authentication,
         private LoggerInterface               $logger,
     ) {
     }
 
     public function handle(Request $request): Response
     {
+        // Идентифицируем пользователя по токену
+        try {
+            $this->authentication->user($request);
+        } catch (AuthException $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+
         try {
             // получаем uuid из запроса
             $uuid = $request->query('post_uuid');

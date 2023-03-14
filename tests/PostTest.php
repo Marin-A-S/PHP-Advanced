@@ -48,7 +48,8 @@ class PostTest extends TestCase
                 new User (
                     new UUID('875b2353-cf39-49aa-a662-93dc36571a80'),
                     new Name('Maria', 'Svetlova'),
-                    'User-4'
+                    'User-4',
+                    'qwerty'
                 ),
                 'Заголовок',
                 'Текст статьи'

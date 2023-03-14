@@ -6,7 +6,6 @@ use Geekbrains\Php2\Blog\Exceptions\ArgumentsException;
 use Geekbrains\Php2\Blog\Exceptions\CommandException;
 use Geekbrains\Php2\Blog\Exceptions\UserNotFoundException;
 use Geekbrains\Php2\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
-use Geekbrains\Php2\Blog\UUID;
 use Geekbrains\Php2\Person\{Name, User};
 use Psr\Log\LoggerInterface;
 
@@ -32,7 +31,6 @@ class CreateUserCommand
     public function handle(Arguments $arguments): void
     {
         // Логируем информацию о том, что команда запущена
-        // Уровень логирования – INFO
         $this->logger->info("Create user command started");
 
         $username = $arguments->get('username');
@@ -45,17 +43,22 @@ class CreateUserCommand
             // Бросаем исключение, если пользователь уже существует
             throw new CommandException("User already exists: $username");
         }
-        // Сохраняем пользователя в репозиторий
-        $uuid = UUID::random();
-        $this->usersRepository->save(new User(
-            $uuid,
+        // Создаём объект пользователя
+        // Функция createFrom сама создаст UUID
+        // и захеширует пароль
+        $user = User::createFrom(
+            $username,
+            $arguments->get('password'),
             new Name(
                 $arguments->get('first_name'),
-                $arguments->get('last_name')),
-            $username
-        ));
+                $arguments->get('last_name')
+            )
+        );
+
+        $this->usersRepository->save($user);
+
         // Логируем информацию о новом пользователе
-        $this->logger->info("User created: $uuid");
+        $this->logger->info("User created: " . $user->uuid());
     }
 
     /**
@@ -65,7 +68,7 @@ class CreateUserCommand
     private function userExists(string $username): bool
     {
         try {
-            // Пытаемся получить пользователя из репозитория
+            // Получаем пользователя из репозитория
             $this->usersRepository->getByUsername($username);
         } catch (UserNotFoundException) {
             return false;

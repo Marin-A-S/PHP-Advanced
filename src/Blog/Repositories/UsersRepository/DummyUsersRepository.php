@@ -23,6 +23,6 @@ class DummyUsersRepository implements UsersRepositoryInterface
     public function getByUsername(string $username): User
     {
         // возвращаем совершенно произвольного пользователя
-        return new User(UUID::random(),  new Name("first", "last"), "user123");
+        return new User(UUID::random(),  new Name("first", "last"), "user123", "qwerty");
     }
 }

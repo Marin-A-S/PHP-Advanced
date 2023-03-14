@@ -25,7 +25,7 @@ class Arguments
         }
     }
 
-    // Логика разбора аргументов командной строкиNo such argument: username
+    // Логика разбора аргументов командной строки
     /**
      * @param array $argv
      * @return static
