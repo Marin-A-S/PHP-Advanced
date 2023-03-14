@@ -1,29 +1,20 @@
 <?php
 
-use src\Blog\Article_Post;
-use src\User\Person_Name;
+use Geekbrains\Php2\Blog\Commands\Arguments;
+use Geekbrains\Php2\Blog\Commands\CreateUserCommand;
+use Psr\Log\LoggerInterface;
 
-spl_autoload_register(function ($class) {
-    $fileName = str_replace('_', '\\', basename($class));
-    $file = substr($class, 0, -strlen($fileName)) . $fileName;
-    $file = str_replace('\\', DIRECTORY_SEPARATOR, $file) . '.php';
-    if (file_exists($file)) {
-        require $file;
-    }
-});
+$container = require __DIR__ . '/bootstrap.php';
 
-$person = new Person_Name(
-    1,
-    'Luke',
-    'Skywalker'
-);
+// Получаем объект логгера из контейнера
+$logger = $container->get(LoggerInterface::class);
 
-$post = new Article_Post(
-    1,
-    1,
-    'Luke Skywalker',
-    'Episode IV: A New Hope',
-    'A long time ago in a galaxy far, far away....'
-);
+// При помощи контейнера создаём команду
+$command = $container->get(CreateUserCommand::class);
 
-print_r($post);
+try {
+    $command->handle(Arguments::fromArgv($argv));
+} catch (Exception $e) {
+    $logger->error($e->getMessage(), ['exception' => $e]);
+    echo $e->getMessage();
+}
