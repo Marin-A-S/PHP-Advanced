@@ -1,5 +1,9 @@
 <?php
 
+use Faker\Provider\Lorem;
+use Faker\Provider\ru_RU\Internet;
+use Faker\Provider\ru_RU\Person;
+use Faker\Provider\ru_RU\Text;
 use Geekbrains\Php2\Blog\Container\DIContainer;
 use Geekbrains\Php2\Blog\Repositories\AuthTokensRepository\AuthTokensRepositoryInterface;
 use Geekbrains\Php2\Blog\Repositories\AuthTokensRepository\SqliteAuthTokensRepository;
@@ -77,6 +81,22 @@ if ('yes' === $_ENV['LOG_TO_CONSOLE']) {
 $container->bind(
     LoggerInterface::class,
     $logger
+);
+
+// Создаём объект генератора тестовых данных
+$faker = new \Faker\Generator();
+
+// Инициализируем необходимые нам виды данных
+$faker->addProvider(new Person($faker));
+$faker->addProvider(new Text($faker));
+$faker->addProvider(new Internet($faker));
+$faker->addProvider(new Lorem($faker));
+
+// Добавляем генератор тестовых данных
+// в контейнер внедрения зависимостей
+$container->bind(
+    \Faker\Generator::class,
+    $faker
 );
 
 $container->bind(

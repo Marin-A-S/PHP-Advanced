@@ -4,12 +4,14 @@ namespace Geekbrains\Php2\Blog\Repositories\CommentsRepository;
 
 use Geekbrains\Php2\Blog\Comment;
 use Geekbrains\Php2\Blog\Exceptions\CommentNotFoundException;
+use Geekbrains\Php2\Blog\Exceptions\CommentsRepositoryException;
 use Geekbrains\Php2\Blog\Exceptions\InvalidArgumentException;
 use Geekbrains\Php2\Blog\Exceptions\UserNotFoundException;
 use Geekbrains\Php2\Blog\Repositories\PostsRepository\SqlitePostsRepository;
 use Geekbrains\Php2\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 use Geekbrains\Php2\Blog\UUID;
 use PDO;
+use PDOException;
 use PDOStatement;
 
 class SqliteCommentsRepository implements CommentsRepositoryInterface
@@ -30,7 +32,18 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
     {
         // Подготавливаем запрос
         $statement = $this->connection->prepare(
-            'INSERT INTO comments (uuid, post_uuid, user_uuid, text) VALUES (:uuid, :post_uuid, :user_uuid, :text)'
+            'INSERT INTO comments (
+                          uuid, 
+                          post_uuid, 
+                          user_uuid, 
+                          text
+                        ) 
+                    VALUES (
+                            :uuid, 
+                            :post_uuid, 
+                            :user_uuid, 
+                            :text
+                        )'
         );
 
         // Выполняем запрос с конкретными значениями
@@ -101,5 +114,17 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
         $statement->execute([
             ':uuid' => (string)$commentUuid,
         ]);
+    }
+
+    public function clear(): void
+    {
+        try {
+            $statement = $this->connection->prepare(
+                'DELETE FROM comments'
+            );
+            $statement->execute();
+        } catch (PDOException $e) {
+            throw new CommentsRepositoryException ($e->getMessage());
+        }
     }
 }

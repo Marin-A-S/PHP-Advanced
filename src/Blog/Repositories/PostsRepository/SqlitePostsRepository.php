@@ -4,11 +4,13 @@ namespace Geekbrains\Php2\Blog\Repositories\PostsRepository;
 
 use Geekbrains\Php2\Blog\Exceptions\InvalidArgumentException;
 use Geekbrains\Php2\Blog\Exceptions\PostNotFoundException;
+use Geekbrains\Php2\Blog\Exceptions\PostsRepositoryException;
 use Geekbrains\Php2\Blog\Exceptions\UserNotFoundException;
 use Geekbrains\Php2\Blog\Post;
 use Geekbrains\Php2\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 use Geekbrains\Php2\Blog\UUID;
 use PDO;
+use PDOException;
 use PDOStatement;
 
 class SqlitePostsRepository implements PostsRepositoryInterface
@@ -19,10 +21,12 @@ class SqlitePostsRepository implements PostsRepositoryInterface
      */
     public function __construct(
         private PDO $connection
-    ) {
+    )
+    {
     }
 
     // метод сохранения и изменения поста
+
     /**
      * @param Post $post
      * @return void
@@ -92,14 +96,33 @@ class SqlitePostsRepository implements PostsRepositoryInterface
 
     public function delete(UUID $postUuid): void
     {
-        // Подготавливаем запрос
-        $statement = $this->connection->prepare(
-            'DELETE FROM posts WHERE uuid=:uuid'
-        );
 
-        // Выполняем запрос с конкретными значениями
-        $statement->execute([
-            ':uuid' => (string)$postUuid,
-        ]);
+        try {
+            // Подготавливаем запрос
+            $statement = $this->connection->prepare(
+                'DELETE FROM posts WHERE uuid=:uuid'
+            );
+
+            // Выполняем запрос с конкретными значениями
+            $statement->execute([
+                ':uuid' => (string)$postUuid,
+            ]);
+        } catch (PDOException $e) {
+            throw new PostsRepositoryException(
+                $e->getMessage(), (int)$e->getCode(), $e
+            );
+        };
+    }
+
+    public function clear(): void
+    {
+        try {
+            $statement = $this->connection->prepare(
+                'DELETE FROM posts'
+            );
+            $statement->execute();
+        } catch (PDOException $e) {
+            throw new PostsRepositoryException ($e->getMessage());
+        }
     }
 }

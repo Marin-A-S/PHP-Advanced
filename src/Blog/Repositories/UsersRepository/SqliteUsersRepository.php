@@ -27,7 +27,23 @@ class SqliteUsersRepository implements UsersRepositoryInterface
     {
         // Подготавливаем запрос
         $statement = $this->connection->prepare(
-            'INSERT INTO users (uuid, first_name, last_name, username, password) VALUES (:uuid, :first_name, :last_name, :username, :password)'
+        'INSERT INTO users (
+                        uuid, 
+                        first_name, 
+                        last_name, 
+                        username, 
+                        password
+                    ) 
+                VALUES (
+                        :uuid, 
+                        :first_name, 
+                        :last_name, 
+                        :username, 
+                        :password
+                    )
+                ON CONFLICT (uuid) DO UPDATE SET
+                        first_name = :first_name,
+                        last_name = :last_name'
         );
 
         // Выполняем запрос с конкретными значениями
@@ -76,6 +92,7 @@ class SqliteUsersRepository implements UsersRepositoryInterface
     }
 
     // Вынесли общую логику в отдельный приватный метод
+
     /**
      * @throws InvalidArgumentException
      * @throws UserNotFoundException
